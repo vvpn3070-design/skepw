@@ -16,12 +16,14 @@ logger = logging.getLogger(__name__)
 TOKEN = "8231417543:AAFQ-as9mzigXJj78shMqDJJJxboSLmAbmQ"
 
 # Каналы для подписки (формат: [название, ссылка, ID/юзернейм])
-# Главный спонсор на самом верху
+# ТОЛЬКО "СПОНСОР" и "ГЛАВНЫЙ СПОНСОР" в названиях
 CHANNELS = [
-    ["🔥 ГЛАВНЫЙ СПОНСОР", "https://t.me/+WNwyn_6yxOc5OGI6", "-1003265823270"],  # Главный спонсор
-    ["🎮 zonixwin", "https://t.me/zonixwin", "-1002544279808"],  # Новый публичный канал
-    ["💎 TeenBody", "https://t.me/+HB4Y6GPYnHQzOTVi", "-1002892302639"],  # Существующий канал
-    ["🎯 Новый канал", "https://t.me/+m_mlxM7IlFk1MGRi", "-1003082454363"],  # Новый приватный канал
+    ["🔴 ГЛАВНЫЙ СПОНСОР", "https://t.me/+WNwyn_6yxOc5OGI6", "-1003265823270"],  # Главный спонсор
+    ["🔵 СПОНСОР", "https://t.me/nitefree", "-1003265823270"],  # Публичный канал nitefree
+    ["🟢 СПОНСОР", "https://t.me/+OmcLF8rmWL9lMTZi", "-1003339930890"],  # Новый приватный канал
+    ["🟡 СПОНСОР", "https://t.me/zonixwin", "-1002544279808"],  # zonixwin
+    ["🟣 СПОНСОР", "https://t.me/+HB4Y6GPYnHQzOTVi", "-1002892302639"],  # TeenBody
+    ["⚪️ СПОНСОР", "https://t.me/+m_mlxM7IlFk1MGRi", "-1003082454363"],  # Новый канал
 ]
 
 # Глобальные переменные для хранения состояния пользователей
@@ -64,7 +66,7 @@ async def check_subscription(user_id: int, context: ContextTypes.DEFAULT_TYPE) -
 def create_subscription_keyboard():
     keyboard = []
     for channel_name, channel_link, channel_id in CHANNELS:
-        keyboard.append([InlineKeyboardButton(f"📢 {channel_name}", url=channel_link)])
+        keyboard.append([InlineKeyboardButton(f"{channel_name}", url=channel_link)])
     keyboard.append([InlineKeyboardButton("✅ Проверить подписку", callback_data="check_subscription")])
     return InlineKeyboardMarkup(keyboard)
 
@@ -142,7 +144,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if not is_subscribed:
                 # Показываем сообщение о необходимости подписки
                 await query.edit_message_caption(
-                    caption="*📢 ПОДПИШИТЕСЬ НА КАНАЛЫ ДЛЯ ДОСТУПА*\n\n*Требуется подписка на ВСЕ каналы:*",
+                    caption="*📢 ПОДПИШИТЕСЬ НА ВСЕХ СПОНСОРОВ ДЛЯ ДОСТУПА*\n\n*Требуется подписка на ВСЕХ спонсоров:*",
                     parse_mode=ParseMode.MARKDOWN
                 )
                 await query.edit_message_reply_markup(
@@ -177,8 +179,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         reply_markup=create_main_menu()
                     )
             else:
+                # Формируем список спонсоров для сообщения
+                sponsors_list = "\n".join([f"{i+1}. {CHANNELS[i][0]}" for i in range(len(CHANNELS))])
+                
                 await query.edit_message_caption(
-                    caption="*❌ Вы не подписаны на все каналы!*\n\n*Проверьте подписку на:*\n1. 🔥 ГЛАВНЫЙ СПОНСОР\n2. 🎮 zonixwin\n3. 💎 TeenBody\n4. 🎯 Новый канал",
+                    caption=f"*❌ Вы не подписаны на всех спонсоров!*\n\n*Требуется подписка на:*\n{sponsors_list}",
                     parse_mode=ParseMode.MARKDOWN
                 )
                 await query.edit_message_reply_markup(
